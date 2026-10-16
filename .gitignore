@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/node_modules/
+frontend/.next/
+frontend/AGENTS.md
+backend/data/
+mock-service/data/
+.env.local
+
