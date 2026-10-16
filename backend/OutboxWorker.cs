@@ -3,7 +3,33 @@ using System.Text.Json;
 
 namespace Fundo.Api;
 
-public sealed class OutboxWorker(LoanStore store, HttpClient client, ILogger<OutboxWorker> logger) : BackgroundService
+public interface IOutboxStore
+{
+    PendingEvent? NextEvent();
+    void MarkDelivered(long id);
+}
+
+public interface IExternalCustomerClient
+{
+    Task Send(PendingEvent pending, CancellationToken cancellationToken);
+}
+
+public sealed class HttpExternalCustomerClient(HttpClient client) : IExternalCustomerClient
+{
+    public async Task Send(PendingEvent pending, CancellationToken cancellationToken)
+    {
+        using var document = JsonDocument.Parse(pending.Payload);
+        var root = document.RootElement;
+        var id = root.GetProperty("customerId").GetInt64();
+        var returning = root.GetProperty("returningCustomer").GetBoolean();
+        using var content = new StringContent(pending.Payload, Encoding.UTF8, "application/json");
+        using var response = await client.SendAsync(new HttpRequestMessage(returning ? HttpMethod.Put : HttpMethod.Post,
+            returning ? $"/customers/{id}" : "/customers") { Content = content }, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+}
+
+public sealed class OutboxWorker(IOutboxStore store, IExternalCustomerClient client, ILogger<OutboxWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -14,14 +40,7 @@ public sealed class OutboxWorker(LoanStore store, HttpClient client, ILogger<Out
                 var pending = store.NextEvent();
                 if (pending is not null)
                 {
-                    using var document = JsonDocument.Parse(pending.Payload);
-                    var root = document.RootElement;
-                    var id = root.GetProperty("customerId").GetInt64();
-                    var returning = root.GetProperty("returningCustomer").GetBoolean();
-                    using var content = new StringContent(pending.Payload, Encoding.UTF8, "application/json");
-                    using var response = await client.SendAsync(new HttpRequestMessage(returning ? HttpMethod.Put : HttpMethod.Post,
-                        returning ? $"/customers/{id}" : "/customers") { Content = content }, stoppingToken);
-                    response.EnsureSuccessStatusCode();
+                    await client.Send(pending, stoppingToken);
                     store.MarkDelivered(pending.Id);
                 }
             }

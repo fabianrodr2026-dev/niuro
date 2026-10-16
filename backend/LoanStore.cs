@@ -6,7 +6,7 @@ namespace Fundo.Api;
 public sealed record SaveResult(long ApplicationId, bool ReturningCustomer);
 public sealed record PendingEvent(long Id, string Payload);
 
-public sealed class LoanStore(IConfiguration configuration)
+public sealed class LoanStore(IConfiguration configuration) : ILoanStore, IOutboxStore
 {
     private readonly string _connectionString = new SqliteConnectionStringBuilder
     {
