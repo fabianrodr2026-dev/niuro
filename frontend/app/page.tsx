@@ -1,10 +1,12 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Outcome = { approved: boolean; reason?: string; applicationId?: number; returningCustomer?: boolean };
 
 export default function Home() {
+  const router = useRouter();
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,10 @@ export default function Home() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "Application could not be submitted.");
+      if (!result.approved) {
+        router.push("/denied");
+        return;
+      }
       setOutcome(result);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Application could not be submitted.");
@@ -35,9 +41,9 @@ export default function Home() {
     <header className="topbar"><span className="brand">fundo<span className="dot">.</span></span><span className="topnote">Business financing, made simple</span></header>
     <section className="panel">
       {outcome ? <div className="result">
-        <div className={outcome.approved ? "badge approved" : "badge denied"}>{outcome.approved ? "Approved" : "Not approved"}</div>
-        <h1>{outcome.approved ? "Your application is approved" : "We can’t approve this application"}</h1>
-        <p>{outcome.approved ? outcome.returningCustomer ? "Your existing application has been updated." : "Your application has been saved." : outcome.reason}</p>
+        <div className="badge approved">Approved</div>
+        <h1>Your application is approved</h1>
+        <p>{outcome.returningCustomer ? "Your existing application has been updated." : "Your application has been saved."}</p>
         {outcome.applicationId && <p className="reference">Application #{outcome.applicationId}</p>}
         <button type="button" className="secondary" onClick={() => setOutcome(null)}>Start another application</button>
       </div> : <>
