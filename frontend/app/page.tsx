@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import StatePicker from "./state-picker";
 
 type Outcome = { approved: boolean; reason?: string; applicationId?: number; returningCustomer?: boolean };
 
@@ -10,10 +11,15 @@ export default function Home() {
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [state, setState] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    if (!state) {
+      setError("Select a state from the list.");
+      return;
+    }
     setLoading(true);
     const form = new FormData(event.currentTarget);
     const request = Object.fromEntries(form.entries());
@@ -45,7 +51,7 @@ export default function Home() {
         <h1>Your application is approved</h1>
         <p>{outcome.returningCustomer ? "Your existing application has been updated." : "Your application has been saved."}</p>
         {outcome.applicationId && <p className="reference">Application #{outcome.applicationId}</p>}
-        <button type="button" className="secondary" onClick={() => setOutcome(null)}>Start another application</button>
+        <button type="button" className="secondary" onClick={() => { setOutcome(null); setState(""); }}>Start another application</button>
       </div> : <>
         <div className="intro"><div className="eyebrow">BUSINESS LOAN APPLICATION</div><h1>Tell us about your business</h1><p>Enter your details to receive an immediate decision.</p></div>
         <form onSubmit={submit}>
@@ -53,7 +59,7 @@ export default function Home() {
             <label>First name<input name="firstName" autoComplete="given-name" required /></label>
             <label>Last name<input name="lastName" autoComplete="family-name" required /></label>
             <label className="wide">Street address<input name="address" autoComplete="street-address" required /></label>
-            <label>State<input name="state" maxLength={2} placeholder="CA" autoComplete="address-level1" required /></label>
+            <StatePicker value={state} onChange={setState} />
             <label>Company name<input name="companyName" autoComplete="organization" required /></label>
             <label>Requested amount ($)<input name="requestedAmount" type="number" min="1" step="0.01" required /></label>
             <label>SSN<input name="ssn" inputMode="numeric" placeholder="123-45-6789" pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}" title="Use 123-45-6789 format" required /></label>
