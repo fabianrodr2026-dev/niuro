@@ -32,6 +32,8 @@ npm run dev
 
 Visit http://localhost:3000. The API listens on http://localhost:5050 and the mock service on http://localhost:5051. The SQLite database is created at `backend/data/fundo.db`. External records can be inspected at http://localhost:5051/customers.
 
+The street-address field accepts manual typing by default. To enable live suggestions from [Geoapify Address Autocomplete](https://apidocs.geoapify.com/docs/geocoding/address-autocomplete/), create `frontend/.env.local` containing `GEOAPIFY_API_KEY=your_key`, then restart Next.js. The key stays on the Next.js server. Manual typing also remains available during a lookup outage. Only the street text is sent to Geoapify for suggestions; SSN and other form fields are not.
+
 ## Run tests
 
 ```powershell

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import StatePicker from "./state-picker";
+import AddressPicker from "./address-picker";
 
 type Outcome = { approved: boolean; reason?: string; applicationId?: number; returningCustomer?: boolean };
 
@@ -58,7 +59,7 @@ export default function Home() {
           <div className="grid">
             <label>First name<input name="firstName" autoComplete="given-name" required /></label>
             <label>Last name<input name="lastName" autoComplete="family-name" required /></label>
-            <label className="wide">Street address<input name="address" autoComplete="street-address" required /></label>
+            <AddressPicker />
             <StatePicker value={state} onChange={setState} />
             <label>Company name<input name="companyName" autoComplete="organization" required /></label>
             <label>Requested amount ($)<input name="requestedAmount" type="number" min="1" step="0.01" required /></label>
