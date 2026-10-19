@@ -1,6 +1,6 @@
 # Fundo loan application demo
 
-Video: not recorded yet.
+Video: (https://www.loom.com/share/fb1e0abeb608452881077d7bc3412dd1)
 
 This is a local implementation of the [Fundo full-stack challenge](https://fundo-llc.github.io/fundo-take-home/full-stack-engineer-challenge/). It includes a Next.js form, a .NET API with SQLite, and a small mock external service.
 
@@ -61,12 +61,12 @@ The tests cover the decision rules, returning-customer updates, transaction roll
 
 Use fictional details only. For each case, enter a name, address, company, and a positive requested amount.
 
-| Result | State | SSN |
-| --- | --- | --- |
-| Approved | CA | 123-45-6789 |
-| Denied by state | NY | 123-45-6789 |
-| Denied by blacklist | CA | 000-00-0000 |
-| Returning customer | CA | 123-45-6789 again, with a changed name or amount |
+| Result              | State | SSN                                              |
+| ------------------- | ----- | ------------------------------------------------ |
+| Approved            | CA    | 123-45-6789                                      |
+| Denied by state     | NY    | 123-45-6789                                      |
+| Denied by blacklist | CA    | 000-00-0000                                      |
+| Returning customer  | CA    | 123-45-6789 again, with a changed name or amount |
 
 The mock service stores one record per customer ID. It may take a few seconds to reflect a submission. If it is offline, the API retains the event and retries while running.
 
