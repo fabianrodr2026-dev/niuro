@@ -2,7 +2,21 @@
 
 Video: not recorded yet.
 
-This is a local implementation of the [Fundo full-stack challenge](https://fundo-llc.github.io/fundo-take-home/full-stack-engineer-challenge/). It includes a Next.js form, a .NET API with SQLite, and a small mock external service. Docker is not used.
+This is a local implementation of the [Fundo full-stack challenge](https://fundo-llc.github.io/fundo-take-home/full-stack-engineer-challenge/). It includes a Next.js form, a .NET API with SQLite, and a small mock external service.
+
+## Run with Docker
+
+With Docker Desktop running, start the whole application from the repository root:
+
+```powershell
+docker compose up --build
+```
+
+Open http://localhost:3000. The API is at http://localhost:5050 and external customer records are at http://localhost:5051/customers. Stop the services with `docker compose down`. The SQLite database and mock customer records persist in named Docker volumes between runs.
+
+The street field works by manual typing without a key. For live address suggestions, set `GEOAPIFY_API_KEY` in your shell before running Compose, for example `$env:GEOAPIFY_API_KEY = "your_key"` in PowerShell. Do not commit the key.
+
+The images are built from this repository using the official .NET and Node base images. A machine without those images or package dependencies cached needs network access for the first build; no external database or messaging image is required.
 
 ## Requirements
 
@@ -32,7 +46,7 @@ npm run dev
 
 Visit http://localhost:3000. The API listens on http://localhost:5050 and the mock service on http://localhost:5051. The SQLite database is created at `backend/data/fundo.db`. External records can be inspected at http://localhost:5051/customers.
 
-The street-address field accepts manual typing by default. To enable live suggestions from [Geoapify Address Autocomplete](https://apidocs.geoapify.com/docs/geocoding/address-autocomplete/), create `frontend/.env.local` containing `GEOAPIFY_API_KEY=your_key`, then restart Next.js. The key stays on the Next.js server. Manual typing also remains available during a lookup outage. Only the street text is sent to Geoapify for suggestions; SSN and other form fields are not.
+The street-address field accepts manual typing by default. For the local non-Docker setup, enable live suggestions from [Geoapify Address Autocomplete](https://apidocs.geoapify.com/docs/geocoding/address-autocomplete/) by creating `frontend/.env.local` containing `GEOAPIFY_API_KEY=your_key`, then restart Next.js. The key stays on the Next.js server. Manual typing also remains available during a lookup outage. Only the street text is sent to Geoapify for suggestions; SSN and other form fields are not.
 
 ## Run tests
 

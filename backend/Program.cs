@@ -1,7 +1,7 @@
 using Fundo.Api;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://localhost:5050");
+builder.WebHost.UseUrls(builder.Configuration["Urls"] ?? "http://localhost:5050");
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod()));
 builder.Services.AddSingleton<RuleEngine>(_ => new RuleEngine([
     new NewYorkRule(),

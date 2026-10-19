@@ -1,0 +1,33 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-}
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5050:5050"
+    environment:
+      Urls: http://0.0.0.0:5050
+      DatabasePath: /app/data/fundo.db
+      ExternalServiceUrl: http://mock-service:5051
+    volumes:
+      - backend-data:/app/data
+    depends_on:
+      - mock-service
+
+  mock-service:
+    build: ./mock-service
+    ports:
+      - "5051:5051"
+    volumes:
+      - mock-data:/app/data
+
+volumes:
+  backend-data:
+  mock-data:
